@@ -33,6 +33,7 @@ string get_currentPath()
     return path;
 }
 
+//add proxy rule from local file 
 void readIpTunList(unordered_set<string> &ipTunList)
 {
     string txtname="rule.txt";

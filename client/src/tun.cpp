@@ -2,13 +2,7 @@
 #include "../include/tun.h"
 #include "../include/rio_io.h"
 #include <string>
-#define maxbuf 4096
-using namespace std;
-unordered_set<string> ipTunList;
-const char subnetmask[] = "255,255,0,0";
-const char tunip[] = "10.0.8.5";
-char tunname[] = "tunruarua";
-unsigned char aeskey[32] = "0";
+
 int open_tun(const char *dev)
 {
   struct ifreq ifr;
@@ -32,6 +26,7 @@ int open_tun(const char *dev)
   }
   return fd;
 }
+
 int setTunAddr(const char *dev, const char *ipaddr, const char *mask)
 {
   sockaddr_in addr;

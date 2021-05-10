@@ -1,4 +1,5 @@
 #include "../include/rio_io.h"
+//robust read without buffer
 ssize_t rio_readn(int fd, void *usrbuf, size_t n)
 {
     size_t nleft = n;
@@ -26,6 +27,8 @@ ssize_t rio_readn(int fd, void *usrbuf, size_t n)
     }
     return (n - nleft);
 }
+
+//robust read without buffer
 ssize_t rio_writen(int fd, void *usrbuf, size_t n)
 {
     size_t nleft = n;
@@ -49,12 +52,16 @@ ssize_t rio_writen(int fd, void *usrbuf, size_t n)
     }
     return n;
 }
+
+//the initialization of robust read with buffer
 void rio_readinitb(rio_t *rp, int fd)
 {
     rp->rio_fd = fd;
     rp->rio_cnt = 0;
     rp->rio_bufptr = rp->rio_buf;
 }
+
+//inner function of robust read
 ssize_t rio_read(rio_t *rp, char *usrbuf, size_t n)
 {
     while (rp->rio_cnt <= 0)
@@ -86,6 +93,8 @@ ssize_t rio_read(rio_t *rp, char *usrbuf, size_t n)
     rp->rio_cnt -= cnt;
     return cnt;
 }
+
+//robust read with buffer
 ssize_t rio_readnb(rio_t *rp, void *usrbuf, size_t n)
 {
     size_t nleft = n;
@@ -106,6 +115,7 @@ ssize_t rio_readnb(rio_t *rp, void *usrbuf, size_t n)
     }
     return (n - nleft);
 }
+
 ssize_t rio_readline(rio_t *rp,void* usrbuf,size_t maxlen)
 {
     int n,rc;

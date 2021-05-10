@@ -161,33 +161,24 @@ int Initcpfd(int tunfd)
 }
 int getKey(int sockfd)
 {
-    cout << sockfd << endl;
     int count = 0;
     unsigned char rsadata[256] = "0";
     unsigned char aeskey[32] = "0";
     while (count != 256)
     {
-        cout << count << endl;
         int n = recv(sockfd, rsadata + count, 256 - count, 0);
         if (n <= 0)
         {
             return -1;
         }
-        cout << n << endl;
         count += n;
     }
-    cout << keypath << endl;
     if (!rsa_decrypt(rsadata, sizeof(rsadata), keypath.c_str(), aeskey))
     {
         return -1;
     }
     for (int i = 0; i <= 31; i++)
         aeskeymp[sockfd][i] = aeskey[i];
-    for (auto a : aeskeymp[sockfd])
-    {
-        cout << (int)a << " ";
-    }
-    cout << endl;
     return 0;
 }
 int tuntotcp(int tunfd)
@@ -200,7 +191,7 @@ int tuntotcp(int tunfd)
         perror("Faied to read tun");
         exit(1);
     }
-    if (buf[0] != 0x45)
+    if (buf[0] != 0x45)//not ipv4
         return 0;
     cout << "receve " << ret << " bytes from tun" << endl;
     RawPDU p((uint8_t *)buf, ret);
@@ -230,11 +221,6 @@ int tuntotcp(int tunfd)
         cout<<len<<endl;
         auto netlen = htons(len);
         memcpy(data, &netlen, sizeof(uint16_t));
-        for (int i = 0; i < len; i++)
-        {
-            cout << (int)data[i] << " ";
-        }
-        cout<<endl;
         ret = rio_writen(dstaddr.fd, data, len+sizeof(uint16_t));
         cout << "send " << len << "bytes to tcpsock" << endl;
     }
@@ -243,17 +229,7 @@ int tuntotcp(int tunfd)
 int tcptotun(msg *im, int tunfd, int sockfd, IPv4Address ciladdrNat)
 {
     unsigned char data[tcpMaxbuf] = "0";
-    for (int i = 0; i < im->len; i++)
-    {
-        cout << (int)im->message[i] << " ";
-    }
-    cout << endl;
     im->len = aes_decrypt(im->message, im->len, aeskeymp[sockfd], 32, data);
-    for (int i = 0; i < im->len; i++)
-    {
-        cout << (int)data[i] << " ";
-    }
-    cout << endl;
     auto mp = snat[ciladdrNat];
     RawPDU p((uint8_t *)data, im->len);
     IP msgip(p.to<IP>());
@@ -291,7 +267,6 @@ int tcptotun(msg *im, int tunfd, int sockfd, IPv4Address ciladdrNat)
 
 void tcpforward(int confd, int tunfd, IPv4Address ciladdrNat)
 {
-    cout << confd << endl;
     if (getKey(confd) < 0)
     {
         close(confd);
@@ -314,7 +289,6 @@ void tcpforward(int confd, int tunfd, IPv4Address ciladdrNat)
     while ((ret = rio_readnb(&rp, data, 2)))
     {
         ready->len = ntohs(*(uint16_t *)&data[0]);
-        cout << ready->len << endl;
         int count = 0;
         while (count != ready->len)
         {
