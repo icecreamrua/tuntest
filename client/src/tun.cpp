@@ -2,7 +2,11 @@
 #include "../include/tun.h"
 #include "../include/rio_io.h"
 #include <string>
-
+const char subnetmask[] = "255,255,0,0";
+const char tunip[] = "10.0.8.5";
+char tunname[] = "tunruarua";
+unsigned char aeskey[32] = "0";
+unordered_set<string> ipTunList;
 int open_tun(const char *dev)
 {
   struct ifreq ifr;
@@ -237,7 +241,6 @@ int sendRecvTcp(int sockfd, int tunfd)
       ret = aes_encrypt(buftun, ret, aeskey, 32, bufsock + sizeof(uint16_t));
       uint16_t len = htons(ret);
       memcpy(bufsock, &len, sizeof(uint16_t));
-      cout << ret << endl;
       ret = send(sockfd, bufsock, ret + sizeof(uint16_t), 0);
       if (ret < 0)
       {
@@ -259,11 +262,6 @@ int sendRecvTcp(int sockfd, int tunfd)
         int n = rio_readnb(&sockrp, bufsock + count, len);
         count += n;
       }
-      for (int i = 0; i < len; i++)
-      {
-        cout << (int)bufsock[i] << " ";
-      }
-      cout << endl;
       len = aes_decrypt(bufsock, len, aeskey, 32, buftun);
       int ret = rio_writen(tunfd, buftun, len);
       memset(bufsock, 0, maxbuf);

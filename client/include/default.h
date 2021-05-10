@@ -27,11 +27,6 @@
 #include <openssl/err.h>
 #define maxbuf 4096
 using namespace std;
-unordered_set<string> ipTunList;
-const char subnetmask[] = "255,255,0,0";
-const char tunip[] = "10.0.8.5";
-char tunname[] = "tunruarua";
-unsigned char aeskey[32] = "0";
 typedef struct msg
 {
     uint16_t len;

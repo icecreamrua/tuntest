@@ -38,11 +38,6 @@
 #include <openssl/aes.h>
 #include <openssl/err.h>
 #define max_client 10
-const char subnetmask[] = "255,255,255,0";
-const char tunip[] = "192.168.61.5";
-const char tuniplist[] = "192.168.61.0";
-const char subIP[] = "192.168.61.";
-char tunname[] = "tunruarua";
 using namespace std;
 using namespace Tins;
 #define tcpMaxbuf 4096

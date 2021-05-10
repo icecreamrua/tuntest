@@ -1,4 +1,3 @@
-#include "../include/define.h"
 #include "../include/readwrite.h"
 #include "../include/server.h"
 #include "../include/rio_io.h"
@@ -6,6 +5,11 @@ using namespace std;
 using namespace Tins;
 unordered_map<IPv4Address, unordered_map<addrPort, addrPortFd, hash_addrport> *> snat;
 unordered_map<int, unsigned char[32]> aeskeymp;
+const char subnetmask[] = "255,255,255,0";
+const char tunip[] = "192.168.61.5";
+const char tuniplist[] = "192.168.61.0";
+const char subIP[] = "192.168.61.";
+char tunname[] = "tunruarua";
 string keypath;
 int iniserver()
 {
