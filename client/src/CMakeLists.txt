@@ -1,0 +1,6 @@
+set(SRC_LIST tun.cpp; default.cpp; rio_io.cpp)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -pthread")
+include_directories(../include)
+add_executable(main ${SRC_LIST})
+TARGET_LINK_LIBRARIES(main ssl crypto)
+set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
