@@ -242,6 +242,7 @@ int sendRecvTcp(int sockfd, int tunfd)
       uint16_t len = htons(ret);
       memcpy(bufsock, &len, sizeof(uint16_t));
       ret = send(sockfd, bufsock, ret + sizeof(uint16_t), 0);
+      cout << "receve " << ret-2 << " bytes" << endl;
       if (ret < 0)
       {
         perror("Failed to send socket");

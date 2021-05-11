@@ -222,7 +222,6 @@ int tuntotcp(int tunfd)
         msgip.dst_addr(dstaddr.addr);
         PDU::serialization_type serval = msgip.serialize();
         uint16_t len = aes_encrypt((unsigned char *)serval.data(), serval.size(), aeskeymp[dstaddr.fd], 32, data + sizeof(uint16_t));
-        cout<<len<<endl;
         auto netlen = htons(len);
         memcpy(data, &netlen, sizeof(uint16_t));
         ret = rio_writen(dstaddr.fd, data, len+sizeof(uint16_t));
