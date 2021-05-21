@@ -76,42 +76,35 @@ void readIpTunList(unordered_set<string> &ipTunList)
     return;
 }
 
-int aes_decrypt(unsigned char* data,size_t datalen,const unsigned char* key,size_t keylen,unsigned char* decryteData)
+int aes_encrypt(unsigned char* data,size_t datalen,unsigned char* key,size_t keylen,unsigned char* encryteData)
 {
-    AES_KEY aeskey;
-    if(AES_set_decrypt_key(key,8*keylen,&aeskey))
-    {
-        ERR_print_errors_fp(stdout);
-        return 0;
-    }
-    unsigned char tem[16]="0";
-    int len=datalen;
-    AES_cbc_encrypt(data,decryteData,datalen,&aeskey,tem,AES_DECRYPT);
-    for(int i=datalen-1;i>=0;i--)
-    {
-        if(decryteData[i]==0)
-        {
-            len--;
-        }
-        else
-        return len;
-    }
-    return len;
+    int reslen=0;
+    int outlen=0;
+    EVP_CIPHER_CTX *ctx;
+    ctx=EVP_CIPHER_CTX_new();
+    unsigned char iv[16]="0";
+    EVP_CipherInit_ex(ctx,EVP_aes_256_cbc(),NULL,key,iv,1);
+    EVP_CipherUpdate(ctx,encryteData,&outlen,data,datalen);
+    reslen=outlen;
+    EVP_CipherFinal(ctx,encryteData+outlen,&outlen);
+    reslen+=outlen;
+    EVP_CIPHER_CTX_free(ctx);
+    return reslen;
 }
-
-int aes_encrypt(unsigned char* data,size_t datalen,const unsigned char* key,size_t keylen,unsigned char* encryteData)
+int aes_decrypt(unsigned char* data,size_t datalen,unsigned char* key,size_t keylen,unsigned char* decryteData)
 {
-    AES_KEY aeskey;
-    if(AES_set_encrypt_key(key,8*keylen,&aeskey))
-    {
-        ERR_print_errors_fp(stdout);
-        return 0;
-    }
-    unsigned char tem[16]="0";
-    int len=16-(datalen%16);
-    len+=datalen;
-    AES_cbc_encrypt(data,encryteData,len,&aeskey,tem,AES_ENCRYPT);
-    return len;
+    int reslen=0;
+    int outlen=0;
+    EVP_CIPHER_CTX *ctx;
+    ctx=EVP_CIPHER_CTX_new();
+    unsigned char iv[16]="0";
+    EVP_CipherInit_ex(ctx,EVP_aes_256_cbc(),NULL,key,iv,0);
+    EVP_CipherUpdate(ctx,decryteData,&outlen,data,datalen);
+    reslen=outlen;
+    EVP_CipherFinal(ctx,decryteData+outlen,&outlen);
+    reslen+=outlen;
+    EVP_CIPHER_CTX_free(ctx);
+    return reslen;
 }
 
 unsigned char *rsa_encrypt(unsigned char *data, size_t datalen,const char *keyPath, unsigned char *encryptedData)
